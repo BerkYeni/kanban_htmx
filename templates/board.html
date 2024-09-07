@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1 class="text-3xl font-bold mb-4">{{ board.name }}</h1>
+<div class="flex space-x-4 overflow-x-auto">
+    {% for column in board.columns %}
+    <div class="column bg-gray-200 p-4 rounded-lg min-w-[250px]" id="column-{{ column.id }}">
+        <h2 class="text-xl font-semibold mb-2">{{ column.name }}</h2>
+        <div class="tasks space-y-2">
+            {% for task in column.tasks %}
+            <div class="task bg-white p-2 rounded shadow cursor-move" 
+                 id="task-{{ task.id }}"
+                 draggable="true">
+                <h3 class="font-medium">{{ task.title }}</h3>
+                <p class="text-sm text-gray-600">{{ task.description }}</p>
+            </div>
+            {% endfor %}
+        </div>
+        <form hx-post="/columns/{{ column.id }}/tasks" 
+              hx-target="#column-{{ column.id }} .tasks" 
+              hx-swap="beforeend"
+              class="mt-2">
+            <input type="text" name="title" placeholder="New task" required
+                   class="w-full p-1 rounded border">
+            <button type="submit" class="mt-1 bg-blue-500 text-white px-2 py-1 rounded">Add Task</button>
+        </form>
+    </div>
+    {% endfor %}
+    <form hx-post="/boards/{{ board.id }}/columns" 
+          hx-target="this" 
+          hx-swap="beforebegin"
+          class="bg-gray-200 p-4 rounded-lg min-w-[250px]">
+        <input type="text" name="name" placeholder="New column" required
+               class="w-full p-1 rounded border">
+        <button type="submit" class="mt-1 bg-green-500 text-white px-2 py-1 rounded">Add Column</button>
+    </form>
+</div>
+{% endblock %}

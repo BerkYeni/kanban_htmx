@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1 class="text-3xl font-bold mb-4">Kanban Boards</h1>
+<div class="space-y-2" id="board-list">
+    {% for board in boards %}
+        {% include 'board_item.html' %}
+    {% endfor %}
+</div>
+<form hx-post="/boards" hx-target="#board-list" hx-swap="beforeend" class="mt-4">
+    <input type="text" name="name" placeholder="New board" required class="p-1 rounded border">
+    <button type="submit" class="bg-blue-500 text-white px-2 py-1 rounded">Add Board</button>
+</form>
+{% endblock %}
