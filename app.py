@@ -97,13 +97,17 @@ def create_app():
         db.session.add(new_task)
         db.session.commit()
 
-        event_queue.put({
-            'type': 'task_added',
-            'column_id': column.id,
-            'task_html': render_template('task.html', task=new_task)
-        })
-
-        return render_template('task.html', task=new_task)
+        if request.headers.get('HX-Request') == 'true':
+            # If it's an HTMX request, return the task HTML directly
+            return render_template('task.html', task=new_task)
+        else:
+            # If it's not an HTMX request, send an SSE event
+            event_queue.put({
+                'type': 'task_added',
+                'column_id': column.id,
+                'task_html': render_template('task.html', task=new_task)
+            })
+            return '', 204  # No content response
 
     @app.route('/tasks/<int:task_id>', methods=['PUT', 'DELETE'])
     def handle_task(task_id):

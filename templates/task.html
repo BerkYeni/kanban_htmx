@@ -1,6 +1,5 @@
-<div class="bg-white p-2 rounded shadow" 
-     hx-put="/tasks/{{ task.id }}"
-     hx-trigger="dragend"
+<div class="task bg-white p-2 rounded shadow cursor-move" 
+     id="task-{{ task.id }}"
      draggable="true">
     <h3 class="font-medium">{{ task.title }}</h3>
     <p class="text-sm text-gray-600">{{ task.description }}</p>

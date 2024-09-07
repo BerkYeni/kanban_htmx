@@ -14,10 +14,12 @@ function initKanban() {
         return;
     }
 
-    tasks.forEach(task => {
+    function attachDragListeners(task) {
         task.addEventListener('dragstart', dragStart);
         task.addEventListener('dragend', dragEnd);
-    });
+    }
+
+    tasks.forEach(attachDragListeners);
 
     columns.forEach(column => {
         column.addEventListener('dragover', dragOver);
@@ -92,17 +94,25 @@ function initKanban() {
             if (task && newColumn) {
                 newColumn.querySelector('.tasks').appendChild(task);
             }
-        } else if (data.type === 'task_added') {
-            const column = document.getElementById(`column-${data.column_id}`);
-            if (column) {
-                const tasksContainer = column.querySelector('.tasks');
-                tasksContainer.insertAdjacentHTML('beforeend', data.task_html);
-                const newTask = tasksContainer.lastElementChild;
-                newTask.addEventListener('dragstart', dragStart);
-                newTask.addEventListener('dragend', dragEnd);
-            }
         }
     };
+
+    // Observe DOM changes to attach listeners to new tasks
+    const observer = new MutationObserver((mutations) => {
+        mutations.forEach((mutation) => {
+            if (mutation.type === 'childList') {
+                mutation.addedNodes.forEach((node) => {
+                    if (node.nodeType === Node.ELEMENT_NODE && node.classList.contains('task')) {
+                        attachDragListeners(node);
+                    }
+                });
+            }
+        });
+    });
+
+    document.querySelectorAll('.tasks').forEach((tasksContainer) => {
+        observer.observe(tasksContainer, { childList: true });
+    });
 }
 
 document.addEventListener('DOMContentLoaded', initKanban);
